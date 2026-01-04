@@ -15,7 +15,7 @@
       inset: 0;
       background: rgba(15, 23, 42, 0.4);
       backdrop-filter: blur(4px);
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
@@ -418,7 +418,7 @@
   </div>
 
   <script>
-    const AUTH_KEY = 'carGiftAdminAuth';
+    const AUTH_KEY = 'carGiftAdminAuthV2';
     const AUTH_PASS = 'admin0000';
     const gate = document.getElementById('authGate');
     const protectedEl = document.getElementById('protected');
@@ -427,14 +427,14 @@
     const authError = document.getElementById('authError');
 
     function showGate() {
-      gate.style.display = 'flex';
-      protectedEl.style.filter = 'blur(6px)';
+      if (gate) gate.style.display = 'flex';
+      if (protectedEl) protectedEl.style.filter = 'blur(6px)';
       if (authInput) authInput.focus();
     }
 
     function hideGate() {
-      gate.style.display = 'none';
-      protectedEl.style.filter = 'none';
+      if (gate) gate.style.display = 'none';
+      if (protectedEl) protectedEl.style.filter = 'none';
     }
 
     function isAuthed() {
@@ -443,6 +443,8 @@
 
     if (!isAuthed()) {
       showGate();
+    } else {
+      hideGate();
     }
 
     if (authForm) {

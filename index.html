@@ -9,8 +9,54 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #authGate {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+    #authGate .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      width: min(360px, 100%);
+      box-shadow: var(--shadow);
+    }
+    #authGate .panel h3 { margin: 0 0 10px; }
+    #authGate .panel p { margin: 0 0 12px; color: var(--muted); }
+    #authGate .panel form { display: grid; gap: 10px; }
+    #authGate input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+    }
+    #authError { color: var(--danger); min-height: 18px; font-size: 13px; }
+  </style>
 </head>
 <body>
+  <div id="authGate">
+    <div class="panel">
+      <h3>تسجيل دخول</h3>
+      <p>الرجاء إدخال كلمة المرور للوصول للوحة الحملة.</p>
+      <form id="authForm">
+        <input type="password" id="authInput" placeholder="كلمة المرور" autocomplete="current-password" required>
+        <div id="authError"></div>
+        <button type="submit" class="primary">دخول</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="protected">
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">🚗</div>
@@ -574,6 +620,50 @@
     </section>
   </main>
 
+  </div>
+
+  <script>
+    const AUTH_KEY = 'carGiftAdminAuthV2';
+    const AUTH_PASS = 'admin0000';
+    const gate = document.getElementById('authGate');
+    const protectedEl = document.getElementById('protected');
+    const authForm = document.getElementById('authForm');
+    const authInput = document.getElementById('authInput');
+    const authError = document.getElementById('authError');
+
+    function showGate() {
+      if (gate) gate.style.display = 'flex';
+      if (protectedEl) protectedEl.style.filter = 'blur(6px)';
+      if (authInput) authInput.focus();
+    }
+
+    function hideGate() {
+      if (gate) gate.style.display = 'none';
+      if (protectedEl) protectedEl.style.filter = 'none';
+    }
+
+    function isAuthed() {
+      return localStorage.getItem(AUTH_KEY) === AUTH_PASS;
+    }
+
+    if (!isAuthed()) {
+      showGate();
+    } else {
+      hideGate();
+    }
+
+    if (authForm) {
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (authInput.value === AUTH_PASS) {
+          localStorage.setItem(AUTH_KEY, AUTH_PASS);
+          hideGate();
+        } else {
+          authError.textContent = 'كلمة المرور غير صحيحة';
+        }
+      });
+    }
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -73,9 +73,9 @@
   <script>
     const JOB_KEY = 'carGiftJobApplicationsV1';
     const THEME_KEY = 'carGiftTheme';
-    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co'; // ضع رابط مشروعك
-    const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE'; // ضع الـ anon key
     const SUPABASE_TABLE = 'vendor_applications';
+    const FORMSPREE_URL = 'https://formspree.io/f/YOUR_FORM_ID'; // (اختياري) Formspree
+    const FORM_ENDPOINT = 'https://formsubmit.co/el/ligiwu'; // Formsubmit endpoint
     const cities = ['رام الله والبيرة','الخليل','نابلس','بيت لحم','طولكرم','جنين','قلقيلية','سلفيت','طوباس'];
     const $ = (id) => document.getElementById(id);
 
@@ -131,8 +131,48 @@
         }
       }
 
+      // إرسال إلى Formsubmit
+      if (FORM_ENDPOINT) {
+        try {
+          const fd = new FormData();
+          fd.append('gender', gender);
+          fd.append('name', name);
+          fd.append('phone', phone);
+          fd.append('city', city);
+          fd.append('role', role);
+          fd.append('experience', experience);
+          fd.append('note', note);
+          fd.append('_subject', 'طلب مروج جديد');
+          fd.append('_captcha', 'false');
+          await fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+        } catch (_) {
+          // تجاهل الخطأ
+        }
+      }
+
+      // إرسال إلى Formspree
+      if (FORMSPREE_URL && !FORMSPREE_URL.includes('YOUR_FORM_ID')) {
+        try {
+          await fetch(FORMSPREE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              gender,
+              name,
+              phone,
+              city,
+              role,
+              experience,
+              note
+            })
+          });
+        } catch (_) {
+          // تجاهل الخطأ
+        }
+      }
+
       e.target.reset();
-      $('jobRole').value = 'مورد كوبونات / خدمات لوجستية';
+      $('jobRole').value = 'مروج كوبونات';
       $('jobAgree').checked = false;
       $('jobGender').value = '';
       const msg = $('jobMsg');
