@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة الموزعين - فرصتك أكبر</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🚗</div>
+      <div>
+        <div class="brand-title">فرصتك أكبر</div>
+        <div class="brand-sub">إدارة الموزعين</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#top">الرئيسية</a>
+      <a href="index.html">العودة للوحة الشاملة</a>
+      <a href="#distributors">الموزعون</a>
+      <a href="#profiles">الملف</a>
+      <a href="#assignments">دفعات الكوبونات</a>
+      <a href="#payments">التحصيل</a>
+      <a href="#quick">سريع</a>
+      <a href="#detail">صفحة الموزع</a>
+    </nav>
+  </aside>
+
+  <main id="top">
+    <header class="topbar">
+      <div>
+        <p class="muted">صفحة مخصصة للموزعين</p>
+        <h1>إدارة تفصيلية للموزعين والكوبونات والتحصيل</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="ghost">وضع مضيء</button>
+        <button id="resetData" class="danger ghost">تصفير البيانات</button>
+      </div>
+    </header>
+
+    <section id="dashboard" class="cards-grid">
+      <div class="card stat">
+        <p class="muted">إجمالي الكوبونات</p>
+        <h3 id="totalCoupons">100,000</h3>
+      </div>
+      <div class="card stat">
+        <p class="muted">المباعة</p>
+        <h3 id="soldCoupons">0</h3>
+      </div>
+      <div class="card stat">
+        <p class="muted">المتبقي</p>
+        <h3 id="remainingCoupons">0</h3>
+      </div>
+      <div class="card stat">
+        <p class="muted">إيراد محصل</p>
+        <h3 id="revenue">0 شيكل</h3>
+      </div>
+      <div class="card progress-card">
+        <div class="progress-head">
+          <div>
+            <p class="muted">التقدم نحو الهدف</p>
+            <h3 id="progressPercent">0%</h3>
+          </div>
+          <div class="pill success">قيد التنفيذ</div>
+        </div>
+        <div class="progress-bar">
+          <div id="progressBarFill"></div>
+        </div>
+        <small id="progressNote">جاهز للانطلاق</small>
+      </div>
+    </section>
+
+    <section id="distributors" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>إدارة الموزعين</h3>
+          <p class="muted">المسند، المباع، التحصيل، المتبقي المالي</p>
+        </div>
+        <div class="head-actions">
+          <button id="exportDistributors" class="ghost">تحميل ملف الموزعين (CSV)</button>
+          <button id="exportDistributorsFull" class="ghost">تحميل ملف مخصص للموزعين</button>
+          <div class="pill warning" id="weakCount">0 موزع أداء ضعيف</div>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>الموزع</th>
+              <th>الهاتف</th>
+              <th>المدينة</th>
+              <th>المنطقة</th>
+              <th>المسند</th>
+              <th>المباع</th>
+              <th>المتبقي</th>
+              <th>مستحق</th>
+              <th>مسلم</th>
+              <th>متبقي مالي</th>
+              <th>الحالة</th>
+              <th>تحكم</th>
+            </tr>
+          </thead>
+          <tbody id="distributorsBody"></tbody>
+        </table>
+      </div>
+      <div class="mini-panels">
+        <div>
+          <h4>الموزعون المتصدرون</h4>
+          <ul id="leaderboard"></ul>
+        </div>
+        <div>
+          <h4>تنبيهات الضعف</h4>
+          <ul id="weakList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="profiles" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>ملف الموزعين وإدخال البيانات</h3>
+          <p class="muted">إضافة/تعديل بيانات الموزع (الاسم، الهاتف، المدينة، المسند)</p>
+        </div>
+      </div>
+      <form id="profileForm" class="form-grid">
+        <label>
+          اختيار موزع لتعديله (اختياري)
+          <select id="profileSelect">
+            <option value="">موزع جديد</option>
+          </select>
+        </label>
+        <label>
+          الاسم
+          <input type="text" id="profileName" required>
+        </label>
+        <label>
+          الهاتف
+          <input type="text" id="profilePhone" placeholder="مثال: 0599-123456" required>
+        </label>
+        <label>
+          المدينة
+          <select id="profileCity" required></select>
+        </label>
+        <label>
+          المنطقة / النقطة
+          <input type="text" id="profileArea" required>
+        </label>
+        <label>
+          المسند (كوبونات)
+          <input type="number" id="profileAssigned" min="0" value="0" required>
+        </label>
+        <button type="submit" class="primary">حفظ / إضافة الموزع</button>
+        <button type="button" id="profileReset" class="ghost">تفريغ الحقول</button>
+      </form>
+    </section>
+
+    <section id="assignments" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>دفعات توزيع الكوبونات</h3>
+          <p class="muted">إضافة كميات مسندة تدريجية لكل موزع مع سجل واضح</p>
+        </div>
+        <div class="head-actions">
+          <button id="exportAssignments" class="ghost">تحميل دفعات التوزيع (CSV)</button>
+        </div>
+      </div>
+      <form id="assignForm" class="form-grid">
+        <label>
+          التاريخ
+          <input type="date" id="assignDate" required>
+        </label>
+        <label>
+          الموزع
+          <select id="assignDistributor" required></select>
+        </label>
+        <label>
+          كمية الدفعة
+          <input type="number" id="assignAmount" min="1" required>
+        </label>
+        <label>
+          ملاحظة
+          <input type="text" id="assignNote" placeholder="مثال: دفعة أولى">
+        </label>
+        <button type="submit" class="primary">إضافة الدفعة</button>
+      </form>
+      <div class="table-wrapper compact">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الموزع</th>
+              <th>المدينة</th>
+              <th>الكمية</th>
+              <th>ملاحظة</th>
+            </tr>
+          </thead>
+          <tbody id="assignmentsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="payments" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>سجل استلام المبالغ</h3>
+          <p class="muted">تسجيل أي دفعة نقدية من الموزعين وربطها بسجل شفاف</p>
+        </div>
+        <div class="head-actions">
+          <button id="exportPayments" class="ghost">تحميل ملف الاستلامات (CSV)</button>
+        </div>
+      </div>
+      <form id="paymentForm" class="form-grid">
+        <label>
+          التاريخ
+          <input type="date" id="paymentDate" required>
+        </label>
+        <label>
+          الموزع
+          <select id="paymentDistributor" required></select>
+        </label>
+        <label>
+          المبلغ المسلم (شيكل)
+          <input type="number" id="paymentAmount" min="1" required>
+        </label>
+        <label>
+          ملاحظة
+          <input type="text" id="paymentNote" placeholder="اختياري">
+        </label>
+        <button type="submit" class="primary">تسجيل الاستلام</button>
+      </form>
+      <div class="table-wrapper compact">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الموزع</th>
+              <th>المدينة</th>
+              <th>المبلغ</th>
+              <th>ملاحظة</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="quick" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>إدارة موزع سريعة</h3>
+          <p class="muted">دفعة كوبونات + استلام مبلغ في خطوة واحدة لنفس الموزع</p>
+        </div>
+      </div>
+      <form id="quickForm" class="form-grid">
+        <label>
+          التاريخ
+          <input type="date" id="quickDate" required>
+        </label>
+        <label>
+          الموزع
+          <select id="quickDistributor" required></select>
+        </label>
+        <label>
+          دفعة كوبونات (اختياري)
+          <input type="number" id="quickAssign" min="0" value="0">
+        </label>
+        <label>
+          مبلغ مستلم (اختياري)
+          <input type="number" id="quickPayment" min="0" value="0">
+        </label>
+        <label>
+          ملاحظة
+          <input type="text" id="quickNote" placeholder="مثال: دفعة + تحصيل أولي">
+        </label>
+        <button type="submit" class="primary">حفظ العملية</button>
+      </form>
+    </section>
+
+    <section id="detail" class="card full">
+      <div class="card-head">
+        <div>
+          <h3>صفحة الموزعين المخصصة</h3>
+          <p class="muted">تحكم كامل لكل موزع: بياناته، الكوبونات، الدفعات، السجلات</p>
+        </div>
+        <div class="head-actions">
+          <select id="detailSelect"></select>
+          <button id="exportDistributorSingle" class="ghost">تحميل ملف الموزع</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <p class="muted">الاسم</p>
+          <h3 id="detailName">-</h3>
+          <p class="muted">الهاتف: <span id="detailPhone">-</span></p>
+          <p class="muted">المدينة: <span id="detailCity">-</span></p>
+          <p class="muted">المنطقة: <span id="detailArea">-</span></p>
+        </div>
+        <div class="card">
+          <p class="muted">المسند</p>
+          <h3 id="detailAssigned">0</h3>
+          <p class="muted">آخر دفعة: <span id="detailLastAssign">-</span></p>
+        </div>
+        <div class="card">
+          <p class="muted">المباع</p>
+          <h3 id="detailSold">0</h3>
+          <p class="muted">المتبقي كوبونات: <span id="detailRemain">0</span></p>
+        </div>
+        <div class="card">
+          <p class="muted">إجمالي مستحق</p>
+          <h3 id="detailExpected">0 شيكل</h3>
+          <p class="muted">مدفوع: <span id="detailPaid">0</span> / متبقي: <span id="detailRemainMoney">0</span></p>
+          <p class="muted">آخر تحصيل: <span id="detailLastPayment">-</span></p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <form id="detailAssignForm" class="form-grid">
+          <label>دفعة كوبونات
+            <input type="number" id="detailAssignAmount" min="1" required>
+          </label>
+          <label>ملاحظة
+            <input type="text" id="detailAssignNote" placeholder="دفعة للميدان">
+          </label>
+          <button type="submit" class="primary">إضافة دفعة</button>
+        </form>
+        <form id="detailPaymentForm" class="form-grid">
+          <label>مبلغ مستلم (شيكل)
+            <input type="number" id="detailPaymentAmount" min="1" required>
+          </label>
+          <label>ملاحظة
+            <input type="text" id="detailPaymentNote" placeholder="تحصيل من الموزع">
+          </label>
+          <button type="submit" class="primary">تسجيل استلام</button>
+        </form>
+      </div>
+
+      <form id="detailSoldForm" class="form-grid">
+        <label>تحديث المباع (قيمة إجمالية)
+          <input type="number" id="detailSoldValue" min="0" required>
+        </label>
+        <button type="submit" class="primary">تحديث المبيعات</button>
+      </form>
+
+      <div class="two-col">
+        <div class="table-wrapper compact">
+          <h4>سجل الدفعات (كوبونات)</h4>
+          <table>
+            <thead>
+              <tr><th>التاريخ</th><th>الكمية</th><th>ملاحظة</th></tr>
+            </thead>
+            <tbody id="detailAssignBody"></tbody>
+          </table>
+        </div>
+        <div class="table-wrapper compact">
+          <h4>سجل التحصيل (مبالغ)</h4>
+          <table>
+            <thead>
+              <tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th></tr>
+            </thead>
+            <tbody id="detailPaymentBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

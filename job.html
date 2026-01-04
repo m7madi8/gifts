@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إعلان وظيفة شاغرة - مورد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="job-page">
+  <main id="top">
+    <header class="topbar">
+      <div>
+        <p class="muted">انضم كمروج للحملة</p>
+        <h1>تقديم طلب مروج</h1>
+        <p class="slogan">أدخل بياناتك لننسق معك لترويج وبيع الكوبونات</p>
+      </div>
+    </header>
+
+    <section class="card full">
+      <div class="card-head">
+        <div>
+          <h3>بيانات المروج</h3>
+        </div>
+      </div>
+      <form id="jobForm" class="form-grid">
+        <label>النوع
+          <select id="jobGender" required>
+            <option value="">اختر</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+          </select>
+        </label>
+        <label>الاسم الكامل   
+          <input type="text" id="jobName" required placeholder="مثال: شركة موارد فلسطين">
+        </label>
+        <label>رقم الهاتف
+          <input type="text" id="jobPhone" required placeholder="05XX-XXXXXX">
+        </label>
+        <label>المدينة
+          <select id="jobCity" required></select>
+        </label>
+        <label>الدور
+          <input type="text" id="jobRole" required value="مروج كوبونات">
+        </label>
+        <label>الخبرة / القدرة
+          <input type="text" id="jobExp" placeholder="">
+        </label>
+       
+        
+        <label>ملاحظات إضافية
+          <input type="text" id="jobNote" placeholder=" ">
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" id="jobAgree" required>
+          <span>أوافق على التواصل معي وأقر بصحة المعلومات</span>
+        </label>
+        <button type="submit" class="primary fullwidth">إرسال الطلب</button>
+      </form>
+      <p id="jobMsg" class="muted"></p>
+    </section>
+
+    <section class="card full">
+      <h3>طبيعة العمل</h3>
+      <p class="muted">
+        طبيعة العمل هي ترويج حملة سحب على سيارة من خلال بيع كوبونات بقيمة 3 شيكل داخل مواقع محددة وحيوية سيتم تحديدها لكل مدينة، حيث سيتم توزيع المروجين بشكل منظم في هذه المناطق لضمان وصول الحملة لأكبر عدد من الناس. العمل ميداني ويحتاج لباقة في التعامل، مظهر لائق، التزام بالقوانين والتعليمات، وقدرة على شرح فكرة الحملة بثقة ومصداقية. لا يوجد تدريب مسبق، لذلك نحتاج أشخاص جاهزين وقادرين على العمل مباشرة ضمن الفريق وبإشراف إداري مباشر.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const JOB_KEY = 'carGiftJobApplicationsV1';
+    const THEME_KEY = 'carGiftTheme';
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co'; // ضع رابط مشروعك
+    const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE'; // ضع الـ anon key
+    const SUPABASE_TABLE = 'vendor_applications';
+    const cities = ['رام الله والبيرة','الخليل','نابلس','بيت لحم','طولكرم','جنين','قلقيلية','سلفيت','طوباس'];
+    const $ = (id) => document.getElementById(id);
+
+    function loadJobs() { try { return JSON.parse(localStorage.getItem(JOB_KEY)) || []; } catch (_) { return []; } }
+    function saveJobs(list) { localStorage.setItem(JOB_KEY, JSON.stringify(list)); }
+    function fillCities() {
+      const select = $('jobCity');
+      if (select) select.innerHTML = cities.map((c)=>`<option value="${c}">${c}</option>`).join('');
+    }
+    function applyThemeFromStorage() {
+      const mode = localStorage.getItem(THEME_KEY) || 'dark';
+      if (mode === 'light') document.body.classList.add('light-mode');
+    }
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const gender = $('jobGender').value;
+      const name = $('jobName').value.trim();
+      const phone = $('jobPhone').value.trim();
+      const city = $('jobCity').value;
+      const role = $('jobRole').value.trim();
+      const experience = $('jobExp').value.trim();
+      const note = $('jobNote').value.trim();
+      const agree = $('jobAgree').checked;
+      if (!gender || !name || !phone || !city || !role || !agree) return;
+      const list = loadJobs();
+      list.push({ id:`job-${Date.now()}`, gender, name, phone, city, role, experience, note, createdAt:new Date().toISOString() });
+      saveJobs(list);
+
+      // إرسال إلى Supabase REST
+      if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.startsWith('https://') && !SUPABASE_ANON_KEY.includes('HERE')) {
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({
+              gender,
+              name,
+              phone,
+              city,
+              role,
+              experience,
+              note,
+              created_at: new Date().toISOString()
+            })
+          });
+        } catch (_) {
+          // تجاهل الخطأ للحفاظ على تجربة المستخدم
+        }
+      }
+
+      e.target.reset();
+      $('jobRole').value = 'مورد كوبونات / خدمات لوجستية';
+      $('jobAgree').checked = false;
+      $('jobGender').value = '';
+      const msg = $('jobMsg');
+      if (msg) { msg.textContent = 'تم استلام طلبك. سنتواصل معك قريباً.'; setTimeout(()=>{msg.textContent='';}, 3000); }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      applyThemeFromStorage();
+      fillCities();
+      const form = $('jobForm');
+      if (form) form.addEventListener('submit', handleSubmit);
+    });
+  </script>
+</body>
+</html>
+
